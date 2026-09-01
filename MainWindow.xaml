@@ -54,7 +54,7 @@
                             <TextBlock Text="R" Foreground="White" FontSize="20" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="ROLL ON INJECTOR" Foreground="#FBF8FF" FontSize="15" FontWeight="Black" LetterSpacing="1.2"/>
+                            <TextBlock Text="ROLL ON INJECTOR" Foreground="#FBF8FF" FontSize="15" FontWeight="Black"/>
                             <TextBlock Text="Fast Flags Control Center" Foreground="#8A829F" FontSize="10" Margin="0,3,0,0"/>
                         </StackPanel>
                     </StackPanel>
@@ -277,7 +277,7 @@
                             <TextBlock Text="R" Foreground="White" FontSize="48" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <TextBlock Text="ROLL ON INJECTOR" Foreground="#FBF8FF" FontSize="29" FontWeight="Black" HorizontalAlignment="Center" Margin="0,22,0,0"/>
-                        <TextBlock Text="FAST FLAGS CONTROL CENTER" Foreground="#9C8ABF" FontSize="10" FontWeight="Bold" LetterSpacing="2.3" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                        <TextBlock Text="FAST FLAGS CONTROL CENTER" Foreground="#9C8ABF" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,6,0,0"/>
                         <Border Height="5" Background="#211631" CornerRadius="3" Margin="20,29,20,0">
                             <Border x:Name="BootProgress" Width="0" HorizontalAlignment="Left" Background="#A06CFF" CornerRadius="3"/>
                         </Border>
