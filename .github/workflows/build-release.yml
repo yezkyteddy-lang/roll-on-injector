@@ -1,0 +1,88 @@
+name: Build Roll On Injector
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore RollOnInjector.csproj
+
+      - name: Build Release
+        run: dotnet build RollOnInjector.csproj --configuration Release --no-restore
+
+      - name: Publish Windows x64
+        run: >
+          dotnet publish RollOnInjector.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --output publish
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=None
+          -p:DebugSymbols=false
+
+      - name: Verify executable
+        shell: pwsh
+        run: |
+          $exe = "publish\RollOnInjector.exe"
+
+          if (!(Test-Path $exe)) {
+            Write-Error "RollOnInjector.exe was not created."
+            exit 1
+          }
+
+          $file = Get-Item $exe
+          Write-Host "Created: $($file.FullName)"
+          Write-Host "Size: $($file.Length) bytes"
+
+      - name: Create Windows ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path "publish\*" `
+            -DestinationPath "RollOnInjector-win-x64.zip" `
+            -Force
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RollOnInjector-win-x64-exe
+          path: publish/RollOnInjector.exe
+          if-no-files-found: error
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RollOnInjector-win-x64-package
+          path: RollOnInjector-win-x64.zip
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            publish/RollOnInjector.exe
+            RollOnInjector-win-x64.zip
