@@ -1,0 +1,290 @@
+<Window x:Class="RollOnInjector.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Roll On Injector"
+        Width="1360" Height="820" MinWidth="1120" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="CanResize"
+        Loaded="Window_Loaded"
+        StateChanged="Window_StateChanged">
+
+    <Window.Resources>
+        <Storyboard x:Key="BootProgressStoryboard">
+            <DoubleAnimation Storyboard.TargetName="BootProgress" Storyboard.TargetProperty="Width" From="0" To="470" Duration="0:0:1.6" />
+        </Storyboard>
+        <Storyboard x:Key="BootFadeStoryboard">
+            <DoubleAnimation Storyboard.TargetName="LoadingOverlay" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.45" />
+        </Storyboard>
+    </Window.Resources>
+
+    <Border CornerRadius="22" Background="#090611" BorderBrush="#3B2868" BorderThickness="1" Padding="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="68"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="34"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="228"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ambient lights -->
+            <Ellipse Width="360" Height="360" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-180,-100,0" Opacity="0.18">
+                <Ellipse.Fill><RadialGradientBrush>
+                    <GradientStop Color="#9B5CFF" Offset="0"/>
+                    <GradientStop Color="#4B2A82" Offset="0.42"/>
+                    <GradientStop Color="#090611" Offset="1"/>
+                </RadialGradientBrush></Ellipse.Fill>
+            </Ellipse>
+            <Ellipse Width="300" Height="300" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-140,0,0,-160" Opacity="0.12">
+                <Ellipse.Fill><RadialGradientBrush>
+                    <GradientStop Color="#7E3FFF" Offset="0"/>
+                    <GradientStop Color="#34195A" Offset="0.5"/>
+                    <GradientStop Color="#090611" Offset="1"/>
+                </RadialGradientBrush></Ellipse.Fill>
+            </Ellipse>
+
+            <!-- title bar -->
+            <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#0D0917" BorderBrush="#251B40" BorderThickness="0,0,0,1" CornerRadius="22,22,0,0">
+                <Grid MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0">
+                        <Border Width="38" Height="38" CornerRadius="12" Background="#7D4DFF" Effect="{StaticResource GlowShadow}">
+                            <TextBlock Text="R" Foreground="White" FontSize="20" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="ROLL ON INJECTOR" Foreground="#FBF8FF" FontSize="15" FontWeight="Black" LetterSpacing="1.2"/>
+                            <TextBlock Text="Fast Flags Control Center" Foreground="#8A829F" FontSize="10" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <Border Background="#141022" BorderBrush="#241B3C" BorderThickness="1" CornerRadius="9" Padding="10,7" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="7" Height="7" Fill="#65F29A" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Text="LOCAL CONFIG MODE" Foreground="#AFA7C8" FontSize="9" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                        <Button Content="—" Width="38" Height="34" Style="{StaticResource PillButton}" Click="Minimize_Click" Margin="0,0,6,0"/>
+                        <Button Content="□" Width="38" Height="34" Style="{StaticResource PillButton}" Click="Maximize_Click" Margin="0,0,6,0"/>
+                        <Button Content="×" Width="38" Height="34" Background="#291325" BorderBrush="#533250" Style="{StaticResource PillButton}" Click="Close_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- sidebar -->
+            <Border Grid.Row="1" Grid.Column="0" Background="#0C0815" BorderBrush="#251B40" BorderThickness="0,0,1,0">
+                <Grid Margin="14,18,14,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="WORKSPACE" Foreground="#5F5874" FontSize="9" FontWeight="Bold" Margin="12,0,0,7"/>
+                        <Button x:Name="NavDashboard" Content="⌂   Dashboard" Style="{StaticResource NavButton}" Click="Dashboard_Click"/>
+                        <Button x:Name="NavFlags" Content="⚡   Fast Flags" Style="{StaticResource NavButton}" Click="Flags_Click"/>
+                        <Button x:Name="NavPresets" Content="★   Presets" Style="{StaticResource NavButton}" Click="Presets_Click"/>
+                        <Button x:Name="NavSettings" Content="⚙   Settings" Style="{StaticResource NavButton}" Click="Settings_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,10">
+                        <Border Background="#121024" BorderBrush="#2D2550" BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="SYSTEM" Foreground="#7B7195" FontSize="9" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Ellipse Width="8" Height="8" Fill="#65F29A" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Ready" Foreground="#F5F0FF" FontSize="11" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <TextBlock x:Name="SidebarVersion" Text="Roblox: scanning…" Foreground="#77708C" FontSize="9" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#16102A" BorderBrush="#34275A" BorderThickness="1" CornerRadius="14" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="ROLL ON LAB" Foreground="#BFA7FF" FontSize="9" FontWeight="Black"/>
+                                <TextBlock Text="Purple command center for local Fast Flag configuration." Foreground="#7E7793" TextWrapping="Wrap" FontSize="9" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2" Text="v2.0 • Windows" Foreground="#4F4860" FontSize="9" Margin="10,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- content -->
+            <Grid Grid.Row="1" Grid.Column="1" Margin="28,24,28,18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <StackPanel>
+                        <TextBlock x:Name="PageTitle" Text="Dashboard" Foreground="#FBF9FF" FontSize="31" FontWeight="Black"/>
+                        <TextBlock x:Name="PageSubtitle" Text="A cleaner, faster control center for your local Fast Flag setup." Foreground="#8E879F" FontSize="11" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="↻  Refresh" Style="{StaticResource PillButton}" Click="Refresh_Click" Margin="0,0,8,0"/>
+                        <Button Content="＋  Import JSON" Style="{StaticResource PillButton}" Click="Import_Click" Margin="0,0,8,0"/>
+                        <Button Content="Apply Changes" Style="{StaticResource PrimaryButton}" Click="Save_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- stats -->
+                <Grid Grid.Row="1" Margin="0,22,0,18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Background="#110D20" BorderBrush="#29203F" BorderThickness="1" CornerRadius="15" Padding="15" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="CLIENT STATUS" Foreground="#6E6782" FontSize="9" FontWeight="Bold"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Ellipse Width="9" Height="9" Fill="#65F29A" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock x:Name="RobloxStatusText" Text="Scanning" Foreground="#FAF7FF" FontSize="18" FontWeight="Black"/>
+                            </StackPanel>
+                            <TextBlock x:Name="PathText" Text="" Foreground="#716B80" FontSize="9" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Background="#110D20" BorderBrush="#29203F" BorderThickness="1" CornerRadius="15" Padding="15" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="ENABLED FLAGS" Foreground="#6E6782" FontSize="9" FontWeight="Bold"/>
+                            <TextBlock x:Name="FlagCountText" Text="0" Foreground="#FBF9FF" FontSize="27" FontWeight="Black" Margin="0,5,0,0"/>
+                            <TextBlock Text="Current editor selection" Foreground="#716B80" FontSize="9"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Background="#110D20" BorderBrush="#29203F" BorderThickness="1" CornerRadius="15" Padding="15" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="BACKUPS" Foreground="#6E6782" FontSize="9" FontWeight="Bold"/>
+                            <TextBlock x:Name="BackupCountText" Text="0" Foreground="#FBF9FF" FontSize="27" FontWeight="Black" Margin="0,5,0,0"/>
+                            <TextBlock Text="Local snapshots" Foreground="#716B80" FontSize="9"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Background="#19112C" BorderBrush="#3B2A67" BorderThickness="1" CornerRadius="15" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="CURRENT PROFILE" Foreground="#8D79B6" FontSize="9" FontWeight="Bold"/>
+                            <TextBlock x:Name="ProfileText" Text="Default" Foreground="#FBF9FF" FontSize="18" FontWeight="Black" Margin="0,8,0,2"/>
+                            <TextBlock Text="Ready to apply" Foreground="#716B80" FontSize="9"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- main workspace -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.7*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="#0F0B1B" BorderBrush="#29203F" BorderThickness="1" CornerRadius="17" Padding="16" Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="FLAG EDITOR" Foreground="#F7F2FF" FontSize="14" FontWeight="Black"/>
+                                    <TextBlock Text="Edit local client configuration without touching process memory." Foreground="#756E84" FontSize="10" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <TextBlock x:Name="CurrentPathText" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#7C7194" FontFamily="{StaticResource MonoFont}" FontSize="9" TextWrapping="Wrap" MaxWidth="340"/>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="0,15,0,12">
+                                <TextBox x:Name="SearchBox" Height="38" Style="{StaticResource FlatTextBox}" TextChanged="SearchBox_TextChanged"/>
+                                <TextBlock Text="Search Fast Flags…" Foreground="#5E586E" IsHitTestVisible="False" VerticalAlignment="Center" Margin="13,0,0,0"/>
+                            </Grid>
+                            <DataGrid Grid.Row="2" x:Name="FlagGrid" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False" HeadersVisibility="Column"
+                                      Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#221A35"
+                                      RowBackground="#110D20" AlternatingRowBackground="#0D0918" Foreground="#F6F2FF"
+                                      ColumnHeaderHeight="34" RowHeight="38" FontSize="10" ItemsSource="{Binding FilteredFlags}">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#151025"/>
+                                        <Setter Property="Foreground" Value="#81788F"/>
+                                        <Setter Property="FontSize" Value="9"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="10,0"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Header="ON" Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" Width="52"/>
+                                    <DataGridTextColumn Header="FLAG" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                    <DataGridTextColumn Header="VALUE" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="170"/>
+                                    <DataGridTextColumn Header="CATEGORY" Binding="{Binding Category}" Width="95" IsReadOnly="True"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Column="1">
+                        <Border Background="#110D20" BorderBrush="#29203F" BorderThickness="1" CornerRadius="17" Padding="16" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="QUICK ACTIONS" Foreground="#F7F2FF" FontSize="14" FontWeight="Black"/>
+                                <TextBlock Text="The fastest path for everyday setup." Foreground="#756E84" FontSize="10" Margin="0,4,0,14"/>
+                                <Grid>
+                                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                    <Button Content="⚡  Apply current configuration" Style="{StaticResource PrimaryButton}" Click="Save_Click" Margin="0,0,0,8"/>
+                                    <Button Grid.Row="1" Content="◎  Launch Roblox" Style="{StaticResource PillButton}" Click="Launch_Click" Margin="0,0,0,8"/>
+                                    <Button Grid.Row="2" Content="↺  Reset editor" Style="{StaticResource PillButton}" Click="Reset_Click"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#110D20" BorderBrush="#29203F" BorderThickness="1" CornerRadius="17" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="PROFILE PRESETS" Foreground="#F7F2FF" FontSize="14" FontWeight="Black"/>
+                                <TextBlock Text="Load a starting point, then fine-tune individual flags." Foreground="#756E84" FontSize="10" Margin="0,4,0,12"/>
+                                <Button Content="Balanced" Style="{StaticResource PillButton}" Click="PresetBalanced_Click" HorizontalAlignment="Stretch" Margin="0,0,0,7"/>
+                                <Button Content="Competitive" Style="{StaticResource PillButton}" Click="PresetCompetitive_Click" HorizontalAlignment="Stretch" Margin="0,0,0,7"/>
+                                <Button Content="Low-end" Style="{StaticResource PillButton}" Click="PresetLowEnd_Click" HorizontalAlignment="Stretch"/>
+                                <Border Background="#0B0815" BorderBrush="#241C38" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,13,0,0">
+                                    <TextBlock Text="Tip: presets only change the editor. Nothing is saved until you press Apply Changes." Foreground="#6E667C" FontSize="9" TextWrapping="Wrap"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- footer -->
+            <Border Grid.Row="2" Grid.ColumnSpan="2" Background="#0B0712" BorderBrush="#251B40" BorderThickness="0,1,0,0">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0">
+                        <Ellipse Width="7" Height="7" Fill="#65F29A" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="StatusText" Text="Ready" Foreground="#766E85" FontSize="9" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="ROLL ON INJECTOR  •  LOCAL CONFIGURATION" Foreground="#4F475C" FontSize="8" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                </DockPanel>
+            </Border>
+
+            <!-- loading screen -->
+            <Grid x:Name="LoadingOverlay" Grid.RowSpan="3" Grid.ColumnSpan="2" Background="#08040E" Panel.ZIndex="100" Opacity="1" IsHitTestVisible="True">
+                <Grid>
+                    <Ellipse Width="700" Height="700" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.35">
+                        <Ellipse.Fill><RadialGradientBrush>
+                            <GradientStop Color="#A86CFF" Offset="0"/>
+                            <GradientStop Color="#4B2678" Offset="0.32"/>
+                            <GradientStop Color="#08040E" Offset="1"/>
+                        </RadialGradientBrush></Ellipse.Fill>
+                    </Ellipse>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="510">
+                        <Border Width="88" Height="88" CornerRadius="28" Background="#7D4DFF" HorizontalAlignment="Center" Effect="{StaticResource GlowShadow}">
+                            <TextBlock Text="R" Foreground="White" FontSize="48" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="ROLL ON INJECTOR" Foreground="#FBF8FF" FontSize="29" FontWeight="Black" HorizontalAlignment="Center" Margin="0,22,0,0"/>
+                        <TextBlock Text="FAST FLAGS CONTROL CENTER" Foreground="#9C8ABF" FontSize="10" FontWeight="Bold" LetterSpacing="2.3" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                        <Border Height="5" Background="#211631" CornerRadius="3" Margin="20,29,20,0">
+                            <Border x:Name="BootProgress" Width="0" HorizontalAlignment="Left" Background="#A06CFF" CornerRadius="3"/>
+                        </Border>
+                        <TextBlock x:Name="BootStatus" Text="Initializing workspace…" Foreground="#6E667B" FontSize="10" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

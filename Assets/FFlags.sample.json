@@ -1,0 +1,7 @@
+{
+  "DFFlagTextureQualityOverrideEnabled": "True",
+  "DFIntTextureQualityOverride": "2",
+  "FFlagDebugGraphicsPreferD3D11": "True",
+  "DFFlagDebugPauseVoxelizer": "False",
+  "FFlagDebugGraphicsDisableDirect3D11": "False"
+}
